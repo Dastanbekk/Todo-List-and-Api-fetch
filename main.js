@@ -1,76 +1,194 @@
-const input = document.getElementById('todo-input');
-const addButton = document.getElementById('add-btn');
+const todoInput = document.getElementById('todo-input');
+const addButton = document.getElementById('add-button');
 const todoList = document.getElementById('todo-list');
 
-// LocalStorage'dan ma'lumotni olish
-function loadTodos() {
-    const todos = JSON.parse(localStorage.getItem('todos')) || [];
-    todos.forEach(todo => addTodoToList(todo.text, todo.time));
+const API_URL = 'https://676afc4abc36a202bb83d19d.mockapi.io/api/v20/todos';
+
+async function fetchTodos() {
+    const response = await fetch(API_URL);
+    const todos = await response.json();
+    renderTodos(todos.slice(0, 10));
 }
 
-// LocalStorage'ga ma'lumotni saqlash
-function saveTodos() {
-    const todos = [];
-    document.querySelectorAll('.todo-item').forEach(item => {
-        const text = item.querySelector('span').textContent;
-        const time = item.querySelector('.time').textContent;
-        todos.push({ text, time });
-    });
-    localStorage.setItem('todos', JSON.stringify(todos));
-}
-
-function addTodoToList(taskText, taskTime) {
-    const listItem = document.createElement('li');
-    listItem.className = 'todo-item';
-
-    const taskSpan = document.createElement('span');
-    taskSpan.textContent = taskText;
-
-    const timeSpan = document.createElement('span');
-    timeSpan.className = 'time';
-    timeSpan.textContent = taskTime;
-
-    const editButton = document.createElement('button');
-    editButton.textContent = 'O‘zgartirish';
-    editButton.addEventListener('click', () => {
-        const newTask = prompt('Vazifani o‘zgartiring:', taskSpan.textContent);
-        if (newTask !== null && newTask.trim() !== '') {
-            taskSpan.textContent = newTask.trim();
-            saveTodos();
+function renderTodos(todos) {
+    todoList.innerHTML = '';
+    todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.textContent = `${todo.title} (${new Date().toLocaleString()})`;
+        li.setAttribute('data-id', todo.id);
+        if (todo.completed) {
+            li.classList.add('completed');
         }
-    });
 
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'O‘chirish';
-    deleteButton.addEventListener('click', () => {
-        todoList.removeChild(listItem);
-        saveTodos();
-    });
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = () => deleteTodo(todo.id);
 
-    listItem.appendChild(taskSpan);
-    listItem.appendChild(timeSpan);
-    listItem.appendChild(editButton);
-    listItem.appendChild(deleteButton);
-    todoList.appendChild(listItem);
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.onclick = () => editTodoPrompt(todo.id, todo.title);
+
+        li.appendChild(editButton);
+        li.appendChild(deleteButton);
+        todoList.appendChild(li);
+    });
 }
 
-addButton.addEventListener('click', () => {
-    const taskText = input.value.trim();
-    if (taskText === '') {
-        alert('Vazifani kiriting!');
-        return;
-    }
+async function addTodo() {
+    const title = todoInput.value;
+    if (!title) return alert('Todo kiriting!');
 
-    const currentTime = new Date();
-    const formattedTime = `${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')} ${currentTime.toLocaleDateString()}`;
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, completed: false })
+    });
 
-    addTodoToList(taskText, formattedTime);
-    saveTodos();
+    const newTodo = await response.json();
+    fetchTodos();
+    todoInput.value = '';
+}
 
-    input.value = '';
-});
+async function deleteTodo(id) {
+    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    fetchTodos();
+}
 
-document.addEventListener('DOMContentLoaded', loadTodos);
+async function editTodoPrompt(id, oldTitle) {
+    const newTitle = prompt('Yangi nomni kiriting:', oldTitle);
+    if (!newTitle) return;
+    
+    await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle, completed: false })
+    });
+    fetchTodos();
+}
+
+addButton.addEventListener('click', addTodo);
+fetchTodos();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const input = document.getElementById('todo-input');
+// const addButton = document.getElementById('add-btn');
+// const todoList = document.getElementById('todo-list');
+
+
+// function fetchTodos(){
+// fetch('https://676afc4abc36a202bb83d19d.mockapi.io/api/v20/todos')
+//     .then((resolve)=>{
+//         return resolve.json();
+//     })
+//     .then((resJson)=>{
+//         const data = resJson;
+//             data.forEach(item=>{
+//                 console.log(`ID: ${item.id}, Title: ${item.title}, Completed: ${item.editTime}`)
+//             })
+//     })
+//     .catch((err)=>{console.log("error");})
+// }
+
+// fetchTodos()
+
+
+
+// // LocalStorage'dan ma'lumotni olish
+// function loadTodos() {
+//     const todos = JSON.parse(localStorage.getItem('todos')) || [];
+//     todos.forEach(todo => addTodoToList(todo.text, todo.time));
+// }
+
+// // LocalStorage'ga ma'lumotni saqlash
+// function saveTodos() {
+//     const todos = [];
+//     document.querySelectorAll('.todo-item').forEach(item => {
+//         const text = item.querySelector('span').textContent;
+//         const time = item.querySelector('.time').textContent;
+//         todos.push({ text, time });
+//     });
+//     localStorage.setItem('todos', JSON.stringify(todos));
+// }
+
+
+// function renderTodos(todos) {
+//     todoList.innerHTML = '';
+//     todos.forEach(todo => {
+//         const li = document.createElement('li');
+//         li.textContent = todo.title;
+//         li.setAttribute('data-id', todo.id);
+//         if (todo.completed) {
+//             li.classList.add('completed');
+//         }
+
+//         const deleteButton = document.createElement('button');
+//         deleteButton.textContent = 'Delete';
+//         deleteButton.onclick = () => deleteTodo(todo.id);
+
+//         const editButton = document.createElement('button');
+//         editButton.textContent = 'Edit';
+//         editButton.onclick = () => editTodoPrompt(todo.id, todo.title);
+
+//         li.appendChild(editButton);
+//         li.appendChild(deleteButton);
+//         todoList.appendChild(li);
+//     });
+// }
+
+
+// addButton.addEventListener('click', () => {
+//     const taskText = input.value.trim();
+//     if (taskText === '') {
+//         alert('Vazifani kiriting!');
+//         return;
+//     }
+
+//     const currentTime = new Date();
+//     const formattedTime = `${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')} ${currentTime.toLocaleDateString()}`;
+
+//     addTodoToList(taskText, formattedTime);
+//     saveTodos();
+
+//     input.value = '';
+// });
+
+// document.addEventListener('DOMContentLoaded', loadTodos);
 
 
 // Fake API URL
@@ -187,15 +305,7 @@ document.addEventListener('DOMContentLoaded', loadTodos);
 
 
 // fetch bilan Apidan malumot olish
-// fetch('https://676afc4abc36a202bb83d19d.mockapi.io/api/v20/todos')
-// .then((resolve)=>{
-//     return resolve.json();
-// })
-// .then((resJson)=>{
-//     console.log(resJson);
-    
-// })
-// .catch((err)=>{console.log("error");})
+
 
 
 

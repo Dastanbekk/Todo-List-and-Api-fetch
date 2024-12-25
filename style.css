@@ -8,7 +8,81 @@ body{
     background-color: #4158D0;
     background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
 }
-.todo-container {
+
+h1{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.inputs{
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+#todo-input {
+    padding: 10px;
+    width: 300px;
+    margin-right: 10px;
+}
+#add-button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+#add-button:hover {
+    background-color: #218838;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+}
+li {
+    padding: 10px;
+    margin: 5px 0;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+button:nth-child(1) {
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+}
+button:nth-child(1):hover {
+    background-color: #0056b3;
+    border-radius: 4px;
+
+}
+button:nth-child(2) {
+    background-color: #dc3545;
+    border-radius: 4px;
+
+    color: white;
+}
+button:nth-child(2):hover {
+    background-color: #c82333;
+}
+/* .todo-container {
     width: 100%;
     margin: 0 auto;
     padding-top: 50px;
@@ -65,4 +139,4 @@ body{
     font-weight: bold;
     border-radius: 10px;
     border: none;
-}
+} */
